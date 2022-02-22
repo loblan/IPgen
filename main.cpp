@@ -10,12 +10,14 @@ struct
     bool sorted = false;
 } flags;
 
+std::ostream *output_stream = &std::cout;
+
 int main(int argc, char *argv[])
 {
     // Help
     if (argc != 2)
     {
-        std::cout << "Usage: " << argv[0] << " EXPR[,EXPR...]" << std::endl;
+        *output_stream << "Usage: " << argv[0] << " EXPR[,EXPR...]" << std::endl;
         exit(1);
     }
 
@@ -24,12 +26,6 @@ int main(int argc, char *argv[])
 
     // Process
     std::list<uint32_t> addresses = processArguments(arguments);
-
-    // Print
-    for (uint32_t &address : addresses)
-    {
-        std::cout << UINT32toIPv4(address) << std::endl;
-    }
 
     exit(0);
 }
@@ -63,8 +59,7 @@ std::list<uint32_t> processArguments(std::list<std::string> arguments)
 
             if (isValidIPv4(first) && isValidIPv4(second))
             {
-                std::list<uint32_t> list = expandRange<uint32_t>(IPv4toUINT32(first), IPv4toUINT32(second));
-                addresses.splice(addresses.end(), list);
+                printIPv4Range<uint32_t>(IPv4toUINT32(first), IPv4toUINT32(second),output_stream);
             }
             else
             {
@@ -86,8 +81,7 @@ std::list<uint32_t> processArguments(std::list<std::string> arguments)
                     uint32_t u = IPv4toUINT32(first);
                     uint32_t mask = UINT32_MAX >> cidr;
 
-                    std::list<uint32_t> list = expandRange<uint32_t>(u - (u & mask),u | mask);
-                    addresses.splice(addresses.end(), list);
+                    printIPv4Range<uint32_t>(u - (u & mask),u | mask,output_stream);
                 }
                 else
                 {
@@ -99,7 +93,7 @@ std::list<uint32_t> processArguments(std::list<std::string> arguments)
                 // is IPv4 address
                 if (isValidIPv4(argument))
                 {
-                    addresses.push_back(IPv4toUINT32(argument));
+                    *output_stream << argument << std::endl;
                 }
                 else
                 {

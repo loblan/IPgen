@@ -6,13 +6,11 @@ std::string UINT32toIPv4(uint32_t);
 bool isValidIPv4(std::string);
 
 template <typename T>
-std::list<T> expandRange(T first, T second)
+void printIPv4Range(T first, T second, std::ostream *output_stream)
 {
     std::pair<T,T> p = std::minmax(first, second);
-    std::list<T> list;
     for (T entry = p.first; entry <= p.second; entry++)
     {
-        list.push_back(entry);
+        *output_stream << UINT32toIPv4(entry) << std::endl;
     }
-    return list;
 }
