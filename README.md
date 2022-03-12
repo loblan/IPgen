@@ -1,8 +1,8 @@
 # IPgen
 
-`IPgen` generate IP adresses from given ranges.
+`IPgen` generate IP adresses from ranges.
 
-It can generate based on simple IP-IP range notation.
+It can generate IP based on simple `IP-IP` range notation.
 
     ipgen 192.168.0.0-192.168.0.10
 
@@ -10,7 +10,7 @@ CIDR notation can also be used.
 
     ipgen 10.0.0.0/8
 
-`ipgen` can also generate IP addresses based on multiple inputs.
+`ipgen` can also generate IP addresses based on multiple ranges.
 
     ipgen 192.168.0.0-192.168.1.0,172.16.0.0/12,10.0.0.1
 
