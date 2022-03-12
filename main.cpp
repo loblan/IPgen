@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "ipgen.h"
 
-std::list<std::string> parseArguments(std::string);
-std::list<uint32_t> processArguments(std::list<std::string>);
+void parseArguments(std::string, std::ostream *);
+void processArguments(std::istream *, std::ostream *);
 
 // Configuration flags
 struct
@@ -10,10 +10,11 @@ struct
     bool sorted = false;
 } flags;
 
-std::ostream *output_stream = &std::cout;
-
 int main(int argc, char *argv[])
 {
+    std::stringstream buffer_stream;
+    std::ostream *output_stream = &std::cout;
+
     // Help
     if (argc != 2)
     {
@@ -22,32 +23,30 @@ int main(int argc, char *argv[])
     }
 
     // Parse
-    std::list<std::string> arguments = parseArguments(argv[1]);
+    parseArguments(argv[1], &buffer_stream);
 
     // Process
-    std::list<uint32_t> addresses = processArguments(arguments);
+    processArguments(&buffer_stream, output_stream);
 
     exit(0);
 }
 
-std::list<std::string> parseArguments(std::string arguments)
+void parseArguments(std::string arguments, std::ostream *output_stream)
 {
-    std::list<std::string> list;
-    std::stringstream stream(arguments);
+    std::stringstream arguments_stream(arguments);
     std::string token;
-    while (std::getline(stream, token, ','))
+    while (std::getline(arguments_stream, token, ','))
     {
-        list.push_back(token);
+        *output_stream << token << std::endl;
     }
-    return list;
 };
 
-std::list<uint32_t> processArguments(std::list<std::string> arguments)
+void processArguments(std::istream *input_stream, std::ostream *output_stream)
 {
     std::list<uint32_t> addresses;
     int cidr;
-    std::string first, second;
-    for (std::string &argument : arguments)
+    std::string first, second, argument;
+    while (std::getline(*input_stream, argument))
     {
         std::size_t pos;
         // is a IP range
@@ -59,7 +58,7 @@ std::list<uint32_t> processArguments(std::list<std::string> arguments)
 
             if (isValidIPv4(first) && isValidIPv4(second))
             {
-                printIPv4Range<uint32_t>(IPv4toUINT32(first), IPv4toUINT32(second),output_stream);
+                printIPv4Range(IPv4toUINT32(first), IPv4toUINT32(second), output_stream);
             }
             else
             {
@@ -81,7 +80,7 @@ std::list<uint32_t> processArguments(std::list<std::string> arguments)
                     uint32_t u = IPv4toUINT32(first);
                     uint32_t mask = UINT32_MAX >> cidr;
 
-                    printIPv4Range<uint32_t>(u - (u & mask),u | mask,output_stream);
+                    printIPv4Range(u - (u & mask), u | mask, output_stream);
                 }
                 else
                 {
@@ -102,5 +101,4 @@ std::list<uint32_t> processArguments(std::list<std::string> arguments)
             }
         }
     }
-    return addresses;
 };
